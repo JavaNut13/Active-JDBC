@@ -169,6 +169,7 @@ public class Query {
    * @throws SQLException
    */
   public ResultSet allCursor() throws SQLException {
+    if(database == null) database = DBInterface.getGlobal();
     return database.query(table, select, where, whereargs, groupBy, orderBy, limit);
   }
 
@@ -179,6 +180,7 @@ public class Query {
    * @throws SQLException
    */
   public ResultSet firstCursor() throws SQLException {
+    if(database == null) database = DBInterface.getGlobal();
     return database.query(table, select, where, whereargs, groupBy, orderBy, 1);
   }
 
@@ -329,7 +331,7 @@ public class Query {
 
   public <T extends Record> ArrayList<T> all(Class<T> cl) throws SQLException {
     ResultSet c = allCursor();
-    ArrayList<T> ar = new ArrayList<T>();
+    ArrayList<T> ar = new ArrayList<>();
     while((c.next())) {
       try {
         T l = cl.newInstance();
