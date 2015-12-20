@@ -10,11 +10,10 @@ import dbinterface.Record;
  * Created by will on 5/08/15.
  */
 public class TestRecord extends Record {
-  public static final String TABLE_NAME = "testtable";
   public String stringVar;
   public int intVar;
   public boolean boolVar;
-  public static final String CREATE = "DROP TABLE IF EXISTS testtable; CREATE TABLE testtable (\n"+
+  public static final String CREATE = "DROP TABLE IF EXISTS testrecord; CREATE TABLE testrecord (\n"+
       "id integer primary key autoincrement,\n"+
       "stringvar varchar(255),\n"+
       "intvar integer,\n"+
@@ -43,9 +42,5 @@ public class TestRecord extends Record {
     container[0] = boolVar;
     container[1] = intVar;
     container[2] = stringVar;
-  }
-
-  public String getTableName() {
-    return TABLE_NAME;
   }
 }

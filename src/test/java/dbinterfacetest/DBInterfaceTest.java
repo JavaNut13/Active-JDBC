@@ -4,7 +4,6 @@ import junit.framework.TestCase;
 
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Test;
 
 import java.sql.ResultSet;
 import java.util.HashMap;
@@ -42,7 +41,7 @@ public class DBInterfaceTest extends TestCase {
     while(rs.next()) {
       i++;
     }
-    assertEquals(3, i);
+    assertEquals(1, i);
     rs.close();
   }
 
@@ -54,7 +53,7 @@ public class DBInterfaceTest extends TestCase {
 
 
   public void testQuery() throws Exception {
-    ResultSet rs = dbi.query("testtable", "*", "boolvar=?", new Object[] {true}, null, null, DBInterface.ALL);
+    ResultSet rs = dbi.query("testrecord", "*", "boolvar=?", new Object[] {true}, null, null, DBInterface.ALL);
     int i = 0;
     while(rs.next()) {
       i++;
@@ -65,7 +64,7 @@ public class DBInterfaceTest extends TestCase {
 
 
   public void testQuery1() throws Exception {
-    ResultSet rs = dbi.query("testtable", "*", null, null, null, null, DBInterface.ALL);
+    ResultSet rs = dbi.query("testrecord", "*", null, null, null, null, DBInterface.ALL);
     int i = 0;
     while(rs.next()) {
       i++;
@@ -76,12 +75,12 @@ public class DBInterfaceTest extends TestCase {
 
 
   public void testUpdate() throws Exception {
-    HashMap<String, Object> vals = new HashMap<String, Object>();
+    HashMap<String, Object> vals = new HashMap<>();
     vals.put("stringvar", "String value");
     vals.put("intvar", 5);
     vals.put("boolvar", false);
-    dbi.update("testtable", vals, null, new Object[]{});
-    ResultSet rs = new Query(dbi).from("testtable").all();
+    dbi.update("testrecord", vals, null, new Object[] {});
+    ResultSet rs = new Query(dbi).from("testrecord").allCursor();
     while(rs.next()) {
       assertEquals(5, rs.getInt("intvar"));
       assertEquals("String value", rs.getString("stringvar"));
@@ -91,12 +90,12 @@ public class DBInterfaceTest extends TestCase {
 
 
   public void testInsert() throws Exception {
-    HashMap<String, Object> vals = new HashMap<String, Object>();
+    HashMap<String, Object> vals = new HashMap<>();
     vals.put("stringvar", "This is a unique value");
     vals.put("intvar", 975);
     vals.put("boolvar", true);
-    dbi.insert("testtable", vals);
-    ResultSet rs = new Query(dbi).from("testtable").orderBy("id DESC").first();
+    dbi.insert("testrecord", vals);
+    ResultSet rs = new Query(dbi).from("testrecord").orderBy("id DESC").firstCursor();
     assertEquals(975, rs.getInt("intvar"));
     assertEquals("This is a unique value", rs.getString("stringvar"));
     assertEquals(true, rs.getBoolean("boolvar"));
@@ -104,8 +103,8 @@ public class DBInterfaceTest extends TestCase {
 
 
   public void testDelete() throws Exception {
-    dbi.delete("testtable", "boolvar=?", new Object[]{true});
-    ResultSet rs = new Query(dbi).from("testtable").all();
+    dbi.delete("testrecord", "boolvar=?", new Object[]{true});
+    ResultSet rs = new Query(dbi).from("testrecord").allCursor();
     int i = 0;
     while(rs.next()) {
       i++;
@@ -116,7 +115,7 @@ public class DBInterfaceTest extends TestCase {
 
 
   public void testRawQuery() throws Exception {
-    ResultSet rs = dbi.rawQuery("select count(*) as count from testtable where boolvar=?", new Object[]{true});
+    ResultSet rs = dbi.rawQuery("select count(*) as count from testrecord where boolvar=?", new Object[]{true});
     assertEquals(5, rs.getInt("count"));
   }
 }

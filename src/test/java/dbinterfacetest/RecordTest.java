@@ -52,7 +52,7 @@ public class RecordTest extends TestCase {
 
   public void testSetValues() throws Exception {
     TestRecord tr = new TestRecord();
-    tr.setValues(new Query(dbi).from("testtable").first());
+    tr.setValues(new Query(dbi).from("testrecord").firstCursor());
     assertEquals(0, tr.intVar);
     assertEquals(true, tr.boolVar);
     assertEquals("String value", tr.stringVar);
@@ -107,7 +107,7 @@ public class RecordTest extends TestCase {
     tr.save(dbi);
     assertEquals(11, tr.getID());
     tr.drop(dbi);
-    ResultSet rs = dbi.rawQuery("select count(*) as count from testtable", new Object[]{});
+    ResultSet rs = dbi.rawQuery("select count(*) as count from testrecord", new Object[]{});
     assertEquals(10, rs.getInt("count"));
   }
 
@@ -123,9 +123,9 @@ public class RecordTest extends TestCase {
   public void testEquals() throws Exception {
     TestRecord tr = new TestRecord();
     tr.save(dbi);
-    TestRecord tr1 = new TestRecord(new Query(dbi).from(TestRecord.class).orderBy("id DESC").first());
+    TestRecord tr1 = new TestRecord(new Query(dbi).from(TestRecord.class).orderBy("id DESC").firstCursor());
     assertEquals(true, tr.equals(tr1));
-    TestRecord tr2 = new TestRecord(new Query(dbi).from(TestRecord.class).first());
+    TestRecord tr2 = new TestRecord(new Query(dbi).from(TestRecord.class).firstCursor());
     assertEquals(false, tr.equals(tr2));
   }
 }

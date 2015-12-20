@@ -88,9 +88,9 @@ public abstract class Record {
    */
   public void save(DBInterface database) throws SQLException {
     if(getID() == -1) {
-      setID(new Query(database).in(this).insert(getValues()));
+      setID(new Query(database).in(this.getClass()).insert(getValues()));
     } else {
-      new Query(database).in(this).update(getID(), getValues());
+      new Query(database).in(this.getClass()).update(getID(), getValues());
     }
   }
 

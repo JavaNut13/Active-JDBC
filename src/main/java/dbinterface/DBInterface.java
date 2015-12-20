@@ -15,12 +15,13 @@ import java.util.HashMap;
  * Data Access Layer to the Sqlite Database
  */
 public class DBInterface {
+  private static DBInterface globalDatabase = null;
   public static final String COLUMN_ID = "id";
   public static final String META_TABLE = "meta_table";
   public static final int DATABASE_VERSION = 0;
   public static final int DEFAULT_ID = -1;
   public static final int ALL = -1;
-  private File debugLocation;
+  private File dbLocation;
 
   private Connection connection;
   private Statement runningStatement;
@@ -34,10 +35,18 @@ public class DBInterface {
   /**
    * Create a DB that sits on the HDD, not in memory
    *
-   * @param debugFile File to save the DB to.
+   * @param location File to save the DB to.
    */
-  public DBInterface(File debugFile) {
-    debugLocation = debugFile;
+  public DBInterface(File location) {
+    dbLocation = location;
+  }
+
+  public void globalize() {
+    globalDatabase = this;
+  }
+
+  public static DBInterface getGlobal() {
+    return globalDatabase;
   }
 
   /**
@@ -50,10 +59,10 @@ public class DBInterface {
   public DBInterface open() throws SQLException {
     close();
     String location = "jdbc:sqlite:";
-    if(debugLocation == null) {
+    if(dbLocation == null) {
       location += ":memory:";
     } else {
-      location += debugLocation.getAbsolutePath();
+      location += dbLocation.getAbsolutePath();
     }
     connection = DriverManager.getConnection(location);
 

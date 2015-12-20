@@ -1,6 +1,5 @@
 package dbinterfacetest;
 
-import junit.framework.Test;
 import junit.framework.TestCase;
 
 import org.junit.After;
@@ -12,7 +11,6 @@ import java.util.HashMap;
 
 import dbinterface.DBInterface;
 import dbinterface.Query;
-import dbinterface.Record;
 
 public class QueryTest extends TestCase {
   DBInterface dbi = null;
@@ -42,8 +40,8 @@ public class QueryTest extends TestCase {
 
 
   public void testWhere() throws Exception {
-    Query q = new Query(dbi).in(TestRecord.TABLE_NAME).where("stringvar LIKE ?", "Another%");
-    ArrayList records = Record.getAll(q.all(), TestRecord.class);
+    Query q = new Query(dbi).in(TestRecord.class).where("stringvar LIKE ?", "Another%");
+    ArrayList records = q.all();
 
     for(Object r : records) {
       assertEquals("Another test string", ((TestRecord) r).stringVar);
@@ -53,8 +51,8 @@ public class QueryTest extends TestCase {
   }
 
   public void testWhereObjects() throws Exception {
-    Query q = new Query(dbi).in(TestRecord.TABLE_NAME).where("intvar > ?", 5);
-    ArrayList records = Record.getAll(q.all(), TestRecord.class);
+    Query q = new Query(dbi).in(TestRecord.class).where("intvar > ?", 5);
+    ArrayList records = q.all();
     TestRecord rec = (TestRecord) records.get(0);
     assertEquals(rec.intVar, 6);
     rec = (TestRecord) records.get(3);
@@ -103,8 +101,8 @@ public class QueryTest extends TestCase {
 
 
   public void testOrderBy() throws Exception {
-    Query q = new Query(dbi).in(TestRecord.TABLE_NAME).orderBy("intvar DESC");
-    ResultSet rs = q.all();
+    Query q = new Query(dbi).in(TestRecord.class).orderBy("intvar DESC");
+    ResultSet rs = q.allCursor();
     int i = 9;
     while(rs.next()) {
       assertEquals(i, rs.getInt("intvar"));
@@ -114,8 +112,8 @@ public class QueryTest extends TestCase {
 
 
   public void testSelect() throws Exception {
-    Query q = new Query(dbi).in(TestRecord.TABLE_NAME).select("count(*) as count, intvar").groupBy("boolvar");
-    ResultSet rs = q.all();
+    Query q = new Query(dbi).in(TestRecord.class).select("count(*) as count, intvar").groupBy("boolvar");
+    ResultSet rs = q.allCursor();
     int c = 0;
     int i = 9;
     while(rs.next()) {
@@ -130,10 +128,10 @@ public class QueryTest extends TestCase {
 
   public void testFrom() throws Exception {
     Query q = new Query(dbi).from("sqlite_sequence");
-    ResultSet rs = q.all();
+    ResultSet rs = q.allCursor();
     boolean found = false;
     while(rs.next()) {
-      if(rs.getString("name").equals("testtable")) {
+      if(rs.getString("name").equals("testrecord")) {
         found = true;
         break;
       }
@@ -143,9 +141,8 @@ public class QueryTest extends TestCase {
 
 
   public void testFrom1() throws Exception {
-    TestRecord tr = new TestRecord();
-    Query q = new Query(dbi).from(tr);
-    ResultSet rs = q.all();
+    Query q = new Query(dbi).from(TestRecord.class);
+    ResultSet rs = q.allCursor();
     int i = 0;
     while(rs.next()) {
       i++;
@@ -161,8 +158,8 @@ public class QueryTest extends TestCase {
     newRec.stringVar = "Unique string value";
     newRec.intVar = 927464;
     newRec.save(dbi);
-    Query q = new Query(dbi).from(newRec).whereID(newRec.getID());
-    TestRecord otherRecord = new TestRecord(q.first());
+    Query q = new Query(dbi).from(TestRecord.class).whereID(newRec.getID());
+    TestRecord otherRecord = new TestRecord(q.firstCursor());
     assertEquals(otherRecord.stringVar, "Unique string value");
     assertEquals(otherRecord.intVar, 927464);
     assertEquals(otherRecord.boolVar, false);
@@ -173,9 +170,9 @@ public class QueryTest extends TestCase {
     HashMap<String, Object> map = new HashMap<String, Object>();
     map.put("intvar", 69);
     map.put("id", 1);
-    new Query(dbi).from("testtable").update(map);
-    Query q = new Query(dbi).from("testtable");
-    ResultSet rs = q.all();
+    new Query(dbi).from("testrecord").update(map);
+    Query q = new Query(dbi).from("testrecord");
+    ResultSet rs = q.allCursor();
     while(rs.next()) {
       assertEquals(69, rs.getInt("intvar"));
     }
@@ -186,9 +183,9 @@ public class QueryTest extends TestCase {
     HashMap<String, Object> map = new HashMap<String, Object>();
     map.put("intvar", 69);
     map.put("id", 1);
-    new Query(dbi).from("testtable").update(1, map);
-    Query q = new Query(dbi).from("testtable");
-    ResultSet rs = q.find(1);
+    new Query(dbi).from("testrecord").update(1, map);
+    Query q = new Query(dbi).from("testrecord");
+    ResultSet rs = q.findCursor(1);
     int i = 0;
     assertEquals(69, rs.getInt("intvar"));
     while(rs.next()) {
@@ -199,9 +196,9 @@ public class QueryTest extends TestCase {
 
 
   public void testDrop() throws Exception {
-    Query q = new Query(dbi).from("testtable").where("boolvar = ?", false);
+    Query q = new Query(dbi).from("testrecord").where("boolvar = ?", false);
     q.drop();
-    ResultSet rs = q.all();
+    ResultSet rs = q.allCursor();
     int i = 0;
     while(rs.next()) {
       i++;
@@ -212,15 +209,15 @@ public class QueryTest extends TestCase {
 
 
   public void testDrop1() throws Exception {
-    Query q = new Query(dbi).from("testtable");
+    Query q = new Query(dbi).from("testrecord");
     q.drop(1);
-    ResultSet rs = q.all();
+    ResultSet rs = q.allCursor();
     int i = 0;
     while(rs.next()) {
       i++;
     }
     assertEquals(9, i);
-    rs = q.find(1);
+    rs = q.findCursor(1);
     i = 0;
     while(rs.next()) {
       i++;
@@ -231,14 +228,14 @@ public class QueryTest extends TestCase {
 
 
   public void testFind() throws Exception {
-    Query q = new Query(dbi).from("testtable");
-    TestRecord tr = new TestRecord(q.find(2));
+    Query q = new Query(dbi).from("testrecord");
+    TestRecord tr = new TestRecord(q.findCursor(2));
     assertEquals(vals[1], tr.stringVar);
   }
 
 
   public void testSql() throws Exception {
-    ResultSet rs = new Query(dbi).sql("select count(*) as count from testtable where stringvar LIKE ? AND boolvar = ?", "%test%", true);
+    ResultSet rs = new Query(dbi).sql("select count(*) as count from testrecord where stringvar LIKE ? AND boolvar = ?", "%test%", true);
     assertEquals(3, rs.getInt("count"));
     rs.close();
   }

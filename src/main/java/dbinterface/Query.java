@@ -312,7 +312,7 @@ public class Query {
    * @throws SQLException
    */
   public ResultSet findCursor(int id) throws SQLException {
-    return where(DBInterface.COLUMN_ID + " = " + Integer.toString(id)).first();
+    return where(DBInterface.COLUMN_ID + " = " + Integer.toString(id)).firstCursor();
   }
 
   /**
