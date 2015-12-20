@@ -10,7 +10,7 @@ Clone the repo, chuck the _dbinterface_ folder into your project (`Record`, `DBI
 
 In the DBInterface `upgrade()` method, run SQL to create your tables and other initialisation - depending on the existing version of the database.
 
-### Open the Database
+## Open the Database
 
 Open the database - either in memory or in a `.db` file:
 
@@ -26,7 +26,7 @@ This means that updates and lookups do not have to be passed a database referenc
 
     dbi.close();
 
-### Creating records
+## Creating records
 
 Create a Location (Assuming `Location` is a subclass of `Record`):
 
