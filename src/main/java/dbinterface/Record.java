@@ -94,6 +94,10 @@ public abstract class Record {
     }
   }
 
+  public void save() throws SQLException {
+    save(DBInterface.getGlobal());
+  }
+
   /**
    * Deletes the record from the database.
    * @param database database
@@ -107,6 +111,9 @@ public abstract class Record {
     return new Query(database).in(getClass()).drop(getID());
   }
 
+  public int drop() throws SQLException {
+    return drop(DBInterface.getGlobal());
+  }
   /**
    * Checks whether this is a new record that is yet to be inserted.
    * @return true if saved, false otherwise.

@@ -387,4 +387,32 @@ public class Query {
     }
     return null;
   }
+
+  public int count() throws SQLException {
+    return count("*");
+  }
+
+  public int count(String column) throws SQLException {
+    return (Integer) scalar("count(" + column + ")");
+  }
+
+  public Object max(String column) throws SQLException {
+    return scalar("max(" + column + ")");
+  }
+
+  public Object min(String column) throws SQLException {
+    return scalar("min(" + column + ")");
+  }
+
+  public Object sum(String column) throws SQLException {
+    return scalar("sum(" + column + ")");
+  }
+
+  public Object scalar(String function) throws SQLException {
+    select = function;
+    ResultSet rs = firstCursor();
+    Object res = rs.getObject(1);
+    rs.close();
+    return res;
+  }
 }

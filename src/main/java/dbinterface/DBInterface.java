@@ -41,8 +41,9 @@ public class DBInterface {
     dbLocation = location;
   }
 
-  public void globalize() {
+  public DBInterface globalize() {
     globalDatabase = this;
+    return this;
   }
 
   public static DBInterface getGlobal() {
@@ -114,22 +115,24 @@ public class DBInterface {
 
   private PreparedStatement prepare(String sql, Object[] whereargs, int start) throws SQLException {
     PreparedStatement stmt = connection.prepareStatement(sql);
-    for(Object arg : whereargs) {
-      if(arg instanceof Integer) {
-        stmt.setInt(start, (Integer) arg);
-      } else if(arg instanceof String) {
-        stmt.setString(start, (String) arg);
-      } else if(arg instanceof Float) {
-        stmt.setFloat(start, (Float) arg);
-      } else if(arg instanceof Long) {
-        stmt.setLong(start, (Long) arg);
-      } else if(arg instanceof Boolean) {
-        stmt.setBoolean(start, (Boolean) arg);
-      } else if(arg instanceof Double) {
-        stmt.setDouble(start, (Double) arg);
-      }
+    if(whereargs != null) {
+      for(Object arg : whereargs) {
+        if(arg instanceof Integer) {
+          stmt.setInt(start, (Integer) arg);
+        } else if(arg instanceof String) {
+          stmt.setString(start, (String) arg);
+        } else if(arg instanceof Float) {
+          stmt.setFloat(start, (Float) arg);
+        } else if(arg instanceof Long) {
+          stmt.setLong(start, (Long) arg);
+        } else if(arg instanceof Boolean) {
+          stmt.setBoolean(start, (Boolean) arg);
+        } else if(arg instanceof Double) {
+          stmt.setDouble(start, (Double) arg);
+        }
 
-      start++;
+        start++;
+      }
     }
     return stmt;
   }
@@ -345,9 +348,7 @@ public class DBInterface {
    * @throws SQLException
    */
   public int delete(String table, String where, Object[] whereargs) throws SQLException {
-    String sql = sql = "DELETE FROM " + table
-        + (where == null ? "" : " WHERE " + where);
-
+    String sql = "DELETE FROM " + table + (where == null ? "" : " WHERE " + where);
     PreparedStatement stmt = prepare(sql, whereargs, 1);
     runningStatement = stmt;
     int id = stmt.executeUpdate();

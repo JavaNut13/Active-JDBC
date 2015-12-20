@@ -6,6 +6,7 @@ import org.junit.After;
 import org.junit.Before;
 
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -238,5 +239,34 @@ public class QueryTest extends TestCase {
     ResultSet rs = new Query(dbi).sql("select count(*) as count from testrecord where stringvar LIKE ? AND boolvar = ?", "%test%", true);
     assertEquals(3, rs.getInt("count"));
     rs.close();
+  }
+
+  private void insertRecords() throws SQLException {
+    new Query(dbi).from(TestRecord.class).drop();
+    for(int i = 0; i < 10; i++) {
+      TestRecord tr = new TestRecord();
+      tr.intVar = i;
+      tr.save(dbi);
+    }
+  }
+
+  public void testCount() throws Exception {
+    insertRecords();
+    assertEquals(10, new Query(dbi).from(TestRecord.class).count());
+  }
+
+  public void testSum() throws Exception {
+    insertRecords();
+    assertEquals(45, new Query(dbi).from(TestRecord.class).sum("intvar"));
+  }
+
+  public void testMin() throws Exception {
+    insertRecords();
+    assertEquals(0, new Query(dbi).from(TestRecord.class).min("intvar"));
+  }
+
+  public void testMax() throws Exception {
+    insertRecords();
+    assertEquals(9, new Query(dbi).from(TestRecord.class).max("intvar"));
   }
 }
